@@ -3,27 +3,26 @@ import math
 import matplotlib.pyplot as plt
 from pyvis.network import Network
 import heapq
-def Dijkstra (G, source):
-
-    #Initializing maps for nodes, to specify weights and edges
+def Dijkstra(G, source):
     distance = {v: math.inf for v in G.nodes()}
     predecessor = {v: None for v in G.nodes()}
     pq = [(0, source)]
     distance[source] = 0
 
-    #The actual algorithm running
-
-    # TODO : Fix this stupid Dijkstra
     while pq:
         current_dist, current_node = heapq.heappop(pq)
+
         if current_dist > distance[current_node]:
             continue
-        else:
-            for neighbor in G.get_neighbors(current_node, source):
-                distance = current_dist + weight
-                distance[neighbor] = current_dist + weight
-                heapq.heappush(pq, (distance, neighbor))
+
+        for neighbor in G.neighbors(current_node):
+            weight = G[current_node][neighbor]['weight']
+            new_dist = current_dist + weight   # FIX 1
+
+            if new_dist < distance[neighbor]:  # FIX 2
+                distance[neighbor] = new_dist
                 predecessor[neighbor] = current_node
+                heapq.heappush(pq, (new_dist, neighbor))
 
     return distance, predecessor
 
@@ -31,8 +30,8 @@ def main():
     G = nx.DiGraph()
     G.add_weighted_edges_from([
         ('S', 'A', 2),
-        ('S', 'C', -4),
-        ('C', 'A', 3),
+        ('S', 'C', 4),
+        ('C', 'A', -3),
         ('A', 'B', 2)
     ])
 
