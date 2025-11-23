@@ -2,31 +2,28 @@ import networkx as nx
 import math
 import matplotlib.pyplot as plt
 from pyvis.network import Network
-
-def Bellman_Ford(G, source):
+import heapq
+def Dijkstra (G, source):
 
     #Initializing maps for nodes, to specify weights and edges
     distance = {v: math.inf for v in G.nodes()}
     predecessor = {v: None for v in G.nodes()}
-
+    pq = [(0, source)]
     distance[source] = 0
 
     #The actual algorithm running
-    for _ in range (len(G.nodes()) - 1):
-        for u, v, data in G.edges(data=True):
-            w = data.get("weight", 1)
-            if distance[u] + w < distance[v]:
-                distance[v] = distance[u] + w
-                predecessor[v] = u
-            if not G.is_directed(): #Also relaxing in the opposite direction in the case of an undirected graph
-                if distance[v] + w < distance[u]:
-                    distance[u] = distance[v] + w
-                    predecessor[u] = v
 
-    for u, v, data in G.edges(data=True):
-        w = data.get("weight", 1)
-        if distance[u] + w < distance[v]:
-            raise  ValueError("Negative weight cycle detected")
+    # TODO : Fix this stupid Dijkstra
+    while pq:
+        current_dist, current_node = heapq.heappop(pq)
+        if current_dist > distance[current_node]:
+            continue
+        else:
+            for neighbor in G.get_neighbors(current_node, source):
+                distance = current_dist + weight
+                distance[neighbor] = current_dist + weight
+                heapq.heappush(pq, (distance, neighbor))
+                predecessor[neighbor] = current_node
 
     return distance, predecessor
 
@@ -44,7 +41,7 @@ def main():
     plt.savefig("graph.png")
     plt.close()
 
-    distance, predecessor = Bellman_Ford(G, 'S')
+    distance, predecessor = Dijkstra(G, 'S')
     print(distance)
     print(predecessor)
 
